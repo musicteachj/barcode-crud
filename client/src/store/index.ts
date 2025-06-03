@@ -1,12 +1,24 @@
 import Vue from "vue";
-import Vuex from "vuex";
+import Vuex, { StoreOptions } from "vuex";
+import axios from "axios";
+import { RootState } from "./types";
+import { barcodes } from "./modules/barcodes";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-  state: {},
-  getters: {},
+const store: StoreOptions<RootState> = {
+  state: {
+    appName: "Barcode Gen",
+    version: "2.0.0",
+  },
   mutations: {},
   actions: {},
-  modules: {},
-});
+  getters: {
+    appTitle: (state) => state.appName,
+  },
+  modules: {
+    barcodes,
+  },
+};
+
+export default new Vuex.Store<RootState>(store);
