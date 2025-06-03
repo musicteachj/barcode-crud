@@ -1,6 +1,5 @@
 import Vue from "vue";
 import Vuex, { StoreOptions } from "vuex";
-import axios from "axios";
 import { RootState } from "./types";
 import { barcodes } from "./modules/barcodes";
 
