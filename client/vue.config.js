@@ -6,7 +6,7 @@ module.exports = defineConfig({
     process.env.NODE_ENV === "production"
       ? "/barcode-crud/" // Replace with your actual repo name
       : "/",
-  outputDir: path.resolve(__dirname, "../server/public"),
+  // outputDir: path.resolve(__dirname, "../server/public"),
   devServer: {
     proxy: {
       "/api": {
