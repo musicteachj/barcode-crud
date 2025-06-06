@@ -238,6 +238,7 @@ import {
 import VueBarcode from "vue-barcode";
 import { v4 as uuidv4 } from "uuid";
 import { mask } from "vue-the-mask";
+import { Barcode } from "@/store/types";
 import {
   BarcodeType,
   BARCODE_TYPES,
@@ -321,7 +322,7 @@ const validBarcodeValue =
   },
 })
 export default class Create extends Vue {
-  @barcodesModule.State("barcodes") barcodes!: any[];
+  @barcodesModule.State("barcodes") barcodes!: Barcode[];
   @barcodesModule.Action("createBarcode") createBarcode!: (
     data: any
   ) => Promise<void>;
