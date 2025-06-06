@@ -3,8 +3,8 @@
     v-model="activeRoute"
     app
     grow
-    color="primary"
-    background-color="primary"
+    color="#fff"
+    background-color="#fff"
     height="56"
   >
     <v-btn
@@ -79,13 +79,17 @@ export default class BottomNav extends Vue {
   }
 
   getTextStyle(routeName: string): { color: string } | null {
-    return this.$route.name !== routeName ? { color: "#fff" } : null;
+    return this.$route.name !== routeName ? { color: "primary" } : null;
   }
 
   getIconColor(routeName: string): string {
-    return this.$route.name !== routeName ? "#fff" : "primary";
+    return this.$route.name !== routeName ? "primary" : "#fff";
   }
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.v-item-group.v-bottom-navigation {
+  box-shadow: none;
+}
+</style>
