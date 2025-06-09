@@ -78,8 +78,8 @@ export default class BottomNav extends Vue {
     this.activeRoute = currentItem?.value || "";
   }
 
-  getTextStyle(routeName: string): { color: string } | null {
-    return this.$route.name !== routeName ? { color: "primary" } : null;
+  getTextStyle(routeName: string): { color: string } | undefined {
+    return this.$route.name !== routeName ? { color: "primary" } : undefined;
   }
 
   getIconColor(routeName: string): string {
