@@ -60,8 +60,8 @@
                 counter="13"
                 maxlength="13"
                 :error-messages="nameErrors"
-                @blur="$v.formData.name.$touch()"
-                @input="$v.formData.name.$touch()"
+                @blur="$v.formData.name?.$touch()"
+                @input="$v.formData.name?.$touch()"
                 class="mb-4"
               />
 
@@ -75,7 +75,7 @@
                 item-text="text"
                 item-value="value"
                 :error-messages="typeErrors"
-                @blur="$v.formData.type.$touch()"
+                @blur="$v.formData.type?.$touch()"
                 @change="onTypeChange"
                 class="mb-4"
               >
@@ -99,12 +99,12 @@
                 :placeholder="valuePlaceholder"
                 outlined
                 prepend-inner-icon="mdi-numeric"
-                :counter="selectedType.value.max"
-                :maxlength="selectedType.value.max"
+                :counter="selectedType.limits.max"
+                :maxlength="selectedType.limits.max"
                 :error-messages="valueErrors"
                 :hint="valueHint"
                 :persistent-hint="true"
-                @blur="$v.formData.value.$touch()"
+                @blur="$v.formData.value?.$touch()"
                 @input="onValueInput"
                 :mask="selectedType.mask"
                 class="mb-6"
@@ -144,7 +144,7 @@
                     </v-card-text>
 
                     <v-card-actions
-                      v-if="isValidBarcode"
+                      v-if="isValidBarcode && selectedType"
                       class="justify-center"
                     >
                       <v-chip small color="success" outlined>
