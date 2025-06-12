@@ -236,7 +236,6 @@ import {
   numeric,
 } from "vuelidate/lib/validators";
 import VueBarcode from "vue-barcode";
-import { v4 as uuidv4 } from "uuid";
 import { mask } from "vue-the-mask";
 import { Barcode } from "@/store/types";
 import {
@@ -534,7 +533,6 @@ export default class Create extends Vue {
 
     try {
       const barcode = {
-        uuid: uuidv4(),
         name: this.formData.name,
         type: this.selectedType!.type,
         value: this.barcodeValue,
