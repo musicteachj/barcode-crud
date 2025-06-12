@@ -77,12 +77,12 @@
         >
           <v-card
             v-for="(barcode, index) in barcodes"
-            :key="barcode.uuid"
+            :key="barcode._id"
             :data-index="index"
             elevation="3"
             class="barcode-card"
-            :class="{ 'barcode-card-hover': hoveredCard === barcode.uuid }"
-            @mouseenter="hoveredCard = barcode.uuid"
+            :class="{ 'barcode-card-hover': hoveredCard === barcode._id }"
+            @mouseenter="hoveredCard = barcode._id || ''"
             @mouseleave="hoveredCard = null"
           >
             <!-- Card Header -->
@@ -110,7 +110,7 @@
             <v-card-text class="text-center py-4">
               <div class="barcode-wrapper">
                 <VueBarcode
-                  :id="`barcode-${barcode.uuid}`"
+                  :id="`barcode-${barcode._id}`"
                   :value="barcode.value"
                   :options="getBarcodeOptions(barcode.type)"
                   class="barcode-display"
