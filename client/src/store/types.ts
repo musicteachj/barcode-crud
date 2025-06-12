@@ -6,7 +6,7 @@ export interface RootState {
 
 // Barcode interfaces
 export interface Barcode {
-  uuid: string;
+  _id?: string;
   value: string;
   type: BarcodeType;
   name: string;

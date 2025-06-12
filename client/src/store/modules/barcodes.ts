@@ -15,7 +15,7 @@ export const barcodes: Module<BarcodeState, RootState> = {
   state: {
     barcodes: [
       {
-        uuid: "123",
+        _id: "123",
         value: "123",
         type: BarcodeType.CODE128, // Default type, can be changed
         name: "Sample Barcode",
@@ -24,7 +24,7 @@ export const barcodes: Module<BarcodeState, RootState> = {
         updatedAt: new Date(),
       },
       {
-        uuid: "456",
+        _id: "456",
         value: "456",
         type: BarcodeType.EAN13, // Default type, can be changed
         name: "Another Barcode",
@@ -33,7 +33,7 @@ export const barcodes: Module<BarcodeState, RootState> = {
         updatedAt: new Date(),
       },
       {
-        uuid: "789",
+        _id: "789",
         value: "789",
         type: BarcodeType.CODE39, // Default type, can be changed
         name: "Third Barcode",
@@ -58,15 +58,15 @@ export const barcodes: Module<BarcodeState, RootState> = {
 
     UPDATE_BARCODE(state, updatedBarcode: Barcode) {
       const index = state.barcodes.findIndex(
-        (b) => b.uuid === updatedBarcode.uuid
+        (b) => b._id === updatedBarcode._id
       );
       if (index !== -1) {
         state.barcodes.splice(index, 1, updatedBarcode);
       }
     },
 
-    REMOVE_BARCODE(state, uuid: string) {
-      state.barcodes = state.barcodes.filter((b) => b.uuid !== uuid);
+    REMOVE_BARCODE(state, _id: string) {
+      state.barcodes = state.barcodes.filter((b) => b._id !== _id);
     },
 
     SET_LOADING(state, loading: boolean) {
@@ -130,10 +130,10 @@ export const barcodes: Module<BarcodeState, RootState> = {
       commit("CLEAR_ERROR");
 
       try {
-        await axios.delete(`/api/barcodes/${barcode.uuid}`);
+        await axios.delete(`/api/barcodes/${barcode._id}`);
 
         // Optimistically remove from state
-        commit("REMOVE_BARCODE", barcode.uuid);
+        commit("REMOVE_BARCODE", barcode._id);
 
         // Refresh to ensure sync
         await dispatch("fetchBarcodes");
@@ -188,8 +188,8 @@ export const barcodes: Module<BarcodeState, RootState> = {
 
     barcodeCount: (state) => state.barcodes.length,
 
-    getBarcodeById: (state) => (uuid: string) => {
-      return state.barcodes.find((b) => b.uuid === uuid);
+    getBarcodeById: (state) => (_id: string) => {
+      return state.barcodes.find((b) => b._id === _id);
     },
 
     getBarcodesByType: (state) => (type: string) => {

@@ -267,7 +267,6 @@ import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import Quagga, { QuaggaResultObject } from "quagga";
 import VueBarcode from "vue-barcode";
-import { v4 as uuidv4 } from "uuid";
 import { getDefaultBarcodeOptions } from "@/constants/barcodeTypes";
 
 const barcodesModule = namespace("barcodes");
@@ -523,7 +522,6 @@ export default class Scan extends Vue {
 
     try {
       const barcode = {
-        uuid: uuidv4(),
         name: this.scanBarName,
         type: this.formatBarcodeType(this.scannedBarcode.codeResult.format),
         value: this.scannedBarcode.codeResult.code,
