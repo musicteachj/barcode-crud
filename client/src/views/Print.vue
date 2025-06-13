@@ -319,7 +319,7 @@ export default class Print extends Vue {
 
   // Lifecycle
   created() {
-    this.fetchBarcodes();
+    // this.fetchBarcodes();
   }
 
   // Methods

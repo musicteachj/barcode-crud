@@ -1,13 +1,34 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { Module } from "vuex";
 import axios, { AxiosError } from "axios";
-import { RootState, BarcodeState, Barcode, BarcodeFormData } from "../types";
+import {
+  RootState,
+  BarcodeState,
+  Barcode,
+  BarcodeFormData,
+  BarcodeType,
+} from "../types";
 
 export const barcodes: Module<BarcodeState, RootState> = {
   namespaced: true,
 
   state: {
-    barcodes: [],
+    barcodes: [
+      {
+        _id: "1",
+        name: "Sample Barcode 1",
+        value: "123456789012",
+        type: BarcodeType.EAN13,
+        createdAt: new Date(),
+      },
+      {
+        _id: "2",
+        name: "Sample Barcode 2",
+        value: "987654321098",
+        type: BarcodeType.UPC,
+        createdAt: new Date(),
+      },
+    ],
     loading: false,
     error: null,
     currentBarcode: null,
