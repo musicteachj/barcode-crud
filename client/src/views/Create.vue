@@ -188,38 +188,6 @@
             </v-form>
           </v-card>
         </transition>
-
-        <!-- Success Snackbar -->
-        <v-snackbar
-          v-model="snackbar"
-          :timeout="4000"
-          color="success"
-          bottom
-          right
-        >
-          <v-icon left>mdi-check-circle</v-icon>
-          Barcode saved successfully!
-          <template v-slot:action="{ attrs }">
-            <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
-          </template>
-        </v-snackbar>
-
-        <!-- Error Alert -->
-        <v-snackbar
-          v-model="errorSnackbar"
-          :timeout="5000"
-          color="error"
-          bottom
-          right
-        >
-          <v-icon left>mdi-alert-circle</v-icon>
-          {{ errorMessage }}
-          <template v-slot:action="{ attrs }">
-            <v-btn text v-bind="attrs" @click="errorSnackbar = false">
-              Close
-            </v-btn>
-          </template>
-        </v-snackbar>
       </v-col>
     </v-row>
   </v-container>
@@ -229,12 +197,7 @@
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { validationMixin } from "vuelidate";
-import {
-  required,
-  minLength,
-  maxLength,
-  numeric,
-} from "vuelidate/lib/validators";
+import { required, minLength, maxLength } from "vuelidate/lib/validators";
 import VueBarcode from "vue-barcode";
 import { mask } from "vue-the-mask";
 import { Barcode } from "@/store/types";
@@ -246,7 +209,9 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cdigit = require("cdigit");
+
 const barcodesModule = namespace("barcodes");
+const snackbarModule = namespace("snackbar");
 
 // Interfaces
 interface FormData {
@@ -321,11 +286,18 @@ const validBarcodeValue =
   },
 })
 export default class Create extends Vue {
+  // Barcodes Vuex State
   @barcodesModule.State("barcodes") barcodes!: Barcode[];
   @barcodesModule.Action("createBarcode") createBarcode!: (
     data: any
   ) => Promise<void>;
   @barcodesModule.Action("fetchBarcodes") fetchBarcodes!: () => Promise<void>;
+
+  // Snackbar Vuex State
+  @snackbarModule.Action("showSuccess")
+  showSuccess!: (message: string) => void;
+  @snackbarModule.Action("showError")
+  showError!: (message: string) => void;
 
   // Form data
   formData: FormData = {
@@ -336,9 +308,6 @@ export default class Create extends Vue {
 
   // UI State
   loading = false;
-  snackbar = false;
-  errorSnackbar = false;
-  errorMessage = "";
 
   // Barcode Types Configuration
   barcodeTypes: BarcodeType[] = BARCODE_TYPES;
@@ -540,7 +509,7 @@ export default class Create extends Vue {
 
       await this.createBarcode({ ...barcode });
 
-      this.snackbar = true;
+      this.showSuccess("Barcode saved successfully!");
       this.resetForm();
 
       // Navigate to print page after short delay
@@ -550,8 +519,7 @@ export default class Create extends Vue {
         }
       }, 1500);
     } catch (error) {
-      this.errorMessage = "Failed to save barcode. Please try again.";
-      this.errorSnackbar = true;
+      this.showError("Failed to save barcode. Please try again.");
     } finally {
       this.loading = false;
     }
