@@ -217,21 +217,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- Snackbar Notifications -->
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="3000"
-      :color="snackbarColor"
-      bottom
-      right
-    >
-      <v-icon left>{{ snackbarIcon }}</v-icon>
-      {{ snackbarMessage }}
-      <template v-slot:action="{ attrs }">
-        <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
-      </template>
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -243,12 +228,12 @@ import { Printd } from "printd";
 import { Barcode } from "@/store/types";
 import {
   BarcodeType,
-  BARCODE_TYPES,
   getBarcodeType,
   getDefaultBarcodeOptions,
 } from "@/constants/barcodeTypes";
 
 const barcodesModule = namespace("barcodes");
+const snackbarModule = namespace("snackbar");
 
 @Component({
   components: {
@@ -256,6 +241,7 @@ const barcodesModule = namespace("barcodes");
   },
 })
 export default class Print extends Vue {
+  // Barcodes Vuex State
   @barcodesModule.State("barcodes") barcodes!: Barcode[];
   @barcodesModule.State("loading") loading!: boolean;
   @barcodesModule.Action("fetchBarcodes") fetchBarcodes!: () => Promise<void>;
@@ -263,17 +249,19 @@ export default class Print extends Vue {
     barcode: Barcode
   ) => Promise<void>;
 
+  // Snackbar Vuex State
+  @snackbarModule.Action("showSuccess")
+  showSuccess!: (message: string) => void;
+  @snackbarModule.Action("showError")
+  showError!: (message: string) => void;
+  @snackbarModule.Action("showInfo")
+  showInfo!: (message: string) => void;
+
   // UI State
   deleteDialog = false;
   deleteLoading = false;
   barcodeToDelete: Barcode | null = null;
   hoveredCard: string | null = null;
-
-  // Snackbar
-  snackbar = false;
-  snackbarMessage = "";
-  snackbarColor = "success";
-  snackbarIcon = "mdi-check-circle";
 
   // Print styles
   printStyles = `
@@ -370,20 +358,11 @@ export default class Print extends Vue {
 
     try {
       await this.deleteBarcodeAction(this.barcodeToDelete);
-
-      this.showSnackbar(
-        "Barcode deleted successfully",
-        "success",
-        "mdi-check-circle"
-      );
+      this.showSuccess("Barcode deleted successfully");
       this.deleteDialog = false;
       this.barcodeToDelete = null;
     } catch (error) {
-      this.showSnackbar(
-        "Failed to delete barcode",
-        "error",
-        "mdi-alert-circle"
-      );
+      this.showError("Failed to delete barcode");
     } finally {
       this.deleteLoading = false;
     }
@@ -404,7 +383,7 @@ export default class Print extends Vue {
       `;
 
       printd.print(wrapper, [this.printStyles]);
-      this.showSnackbar("Opening print dialog...", "info", "mdi-printer");
+      this.showInfo("Opening print dialog...");
     }
   }
 
@@ -428,18 +407,7 @@ export default class Print extends Vue {
     });
 
     printd.print(wrapper, [this.printStyles]);
-    this.showSnackbar(
-      "Opening print dialog for all barcodes...",
-      "info",
-      "mdi-printer"
-    );
-  }
-
-  showSnackbar(message: string, color: string, icon: string) {
-    this.snackbarMessage = message;
-    this.snackbarColor = color;
-    this.snackbarIcon = icon;
-    this.snackbar = true;
+    this.showInfo("Opening print dialog for all barcodes...");
   }
 }
 </script>

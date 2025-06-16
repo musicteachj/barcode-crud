@@ -152,21 +152,27 @@
                 </v-card-text>
 
                 <v-card-actions class="pa-4">
-                  <v-btn large text @click="reset">
-                    <v-icon left>mdi-refresh</v-icon>
-                    Scan Another
-                  </v-btn>
-                  <v-spacer />
-                  <v-btn
-                    large
-                    color="primary"
-                    :disabled="!valid"
-                    :loading="saveLoading"
-                    @click="saveScan"
-                  >
-                    <v-icon left>mdi-content-save</v-icon>
-                    Save Barcode
-                  </v-btn>
+                  <v-row class="mt-6">
+                    <v-col cols="12" sm="6">
+                      <v-btn block large text @click="reset">
+                        <v-icon left>mdi-refresh</v-icon>
+                        Scan Another
+                      </v-btn>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-btn
+                        block
+                        large
+                        color="primary"
+                        :disabled="!valid"
+                        :loading="saveLoading"
+                        @click="saveScan"
+                      >
+                        <v-icon left>mdi-content-save</v-icon>
+                        Save Barcode
+                      </v-btn>
+                    </v-col>
+                  </v-row>
                 </v-card-actions>
               </v-card>
             </transition>
@@ -244,21 +250,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Snackbar -->
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="4000"
-      :color="snackbarColor"
-      bottom
-      right
-    >
-      <v-icon left>{{ snackbarIcon }}</v-icon>
-      {{ snackbarMessage }}
-      <template v-slot:action="{ attrs }">
-        <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
-      </template>
-    </v-snackbar>
   </div>
 </template>
 
@@ -268,8 +259,10 @@ import { namespace } from "vuex-class";
 import Quagga, { QuaggaResultObject } from "quagga";
 import VueBarcode from "vue-barcode";
 import { getDefaultBarcodeOptions } from "@/constants/barcodeTypes";
+import { Barcode } from "@/store/types";
 
 const barcodesModule = namespace("barcodes");
+const snackbarModule = namespace("snackbar");
 
 @Component({
   components: {
@@ -277,10 +270,17 @@ const barcodesModule = namespace("barcodes");
   },
 })
 export default class Scan extends Vue {
-  @barcodesModule.State("barcodes") barcodes!: any[];
+  // Barcodes Vuex State
+  @barcodesModule.State("barcodes") barcodes!: Barcode[];
   @barcodesModule.Action("createBarcode") createBarcode!: (
     data: any
   ) => Promise<void>;
+
+  // Snackbar Vuex State
+  @snackbarModule.Action("showSuccess")
+  showSuccess!: (message: string) => void;
+  @snackbarModule.Action("showError")
+  showError!: (message: string) => void;
 
   // Camera state
   cameraDetected = false;
@@ -292,12 +292,6 @@ export default class Scan extends Vue {
   valid = false;
   scanBarName = "";
   scannedBarcode: QuaggaResultObject | null = null;
-
-  // UI state
-  snackbar = false;
-  snackbarMessage = "";
-  snackbarColor = "success";
-  snackbarIcon = "mdi-check-circle";
 
   // Window dimensions
   windowWidth = window.innerWidth;
@@ -391,11 +385,11 @@ export default class Scan extends Vue {
         decoder: {
           readers: [
             "ean_reader",
-            "ean_8_reader",
-            "code_128_reader",
-            "code_39_reader",
-            "upc_reader",
-            "upc_e_reader",
+            // "ean_8_reader",
+            // "code_128_reader",
+            // "code_39_reader",
+            // "upc_reader",
+            // "upc_e_reader",
           ],
         },
         locate: true,
@@ -405,11 +399,7 @@ export default class Scan extends Vue {
 
         if (err) {
           console.error("Quagga init error:", err);
-          this.showSnackbar(
-            "Failed to start camera",
-            "error",
-            "mdi-alert-circle"
-          );
+          this.showError("Failed to start camera");
           this.isScanning = false;
           return;
         }
@@ -444,7 +434,7 @@ export default class Scan extends Vue {
     }
   }
 
-  onProcessed(result: any) {
+  onProcessed(result: QuaggaResultObject) {
     const drawingCtx = Quagga.canvas.ctx.overlay;
     const drawingCanvas = Quagga.canvas.dom.overlay;
 
@@ -458,8 +448,8 @@ export default class Scan extends Vue {
         );
 
         result.boxes
-          .filter((box: any) => box !== result.box)
-          .forEach((box: any) => {
+          .filter((box) => box !== result.box)
+          .forEach((box) => {
             Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, {
               color: "green",
               lineWidth: 2,
@@ -474,7 +464,7 @@ export default class Scan extends Vue {
         });
       }
 
-      if (result.codeResult && result.codeResult.code) {
+      if (result.codeResult && result.codeResult.code && result.line) {
         Quagga.ImageDebug.drawPath(
           result.line,
           { x: "x", y: "y" },
@@ -505,7 +495,7 @@ export default class Scan extends Vue {
     this.scannedBarcode = null;
     this.valid = false;
     if (this.$refs.scanForm) {
-      (this.$refs.scanForm as any).reset();
+      (this.$refs.scanForm as HTMLFormElement).reset();
     }
   }
 
@@ -530,11 +520,7 @@ export default class Scan extends Vue {
 
       await this.createBarcode(barcode);
 
-      this.showSnackbar(
-        "Barcode saved successfully!",
-        "success",
-        "mdi-check-circle"
-      );
+      this.showSuccess("Barcode saved successfully!");
       this.reset();
 
       // Navigate to print page after delay if this was the first barcode
@@ -544,17 +530,10 @@ export default class Scan extends Vue {
         }, 1500);
       }
     } catch (error) {
-      this.showSnackbar("Failed to save barcode", "error", "mdi-alert-circle");
+      this.showError("Failed to save barcode");
     } finally {
       this.saveLoading = false;
     }
-  }
-
-  showSnackbar(message: string, color: string, icon: string) {
-    this.snackbarMessage = message;
-    this.snackbarColor = color;
-    this.snackbarIcon = icon;
-    this.snackbar = true;
   }
 
   // Watchers

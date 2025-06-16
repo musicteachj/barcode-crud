@@ -1,14 +1,15 @@
 <template>
   <v-app>
     <TopToolbar v-if="showNavigation" class="top-toolbar" />
-
     <v-main>
       <transition name="fade" mode="out-in">
         <router-view :key="$route.fullPath" />
       </transition>
     </v-main>
-
     <BottomNav v-if="showNavigation" class="bottom-nav" />
+
+    <!-- Global Snackbar -->
+    <GlobalSnackbar />
   </v-app>
 </template>
 
@@ -16,11 +17,13 @@
 import { Component, Vue } from "vue-property-decorator";
 import TopToolbar from "@/components/navigation/TopToolbar.vue";
 import BottomNav from "@/components/navigation/BottomNav.vue";
+import GlobalSnackbar from "@/components/GlobalSnackbar.vue";
 
 @Component({
   components: {
     TopToolbar,
     BottomNav,
+    GlobalSnackbar,
   },
 })
 export default class App extends Vue {

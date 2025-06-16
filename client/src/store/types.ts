@@ -54,3 +54,37 @@ export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
 }
+
+export interface SnackbarState {
+  show: boolean;
+  message: string;
+  icon: string;
+  color: string;
+  timeout: number;
+  multiLine: boolean;
+  vertical: boolean;
+  top: boolean;
+  bottom: boolean;
+  left: boolean;
+  right: boolean;
+  centered: boolean;
+}
+
+export interface RootState {
+  appName: string;
+  version: string;
+}
+
+export interface SnackbarOptions {
+  message: string;
+  icon?: string;
+  color?: string;
+  timeout?: number;
+  multiLine?: boolean;
+  vertical?: boolean;
+  top?: boolean;
+  bottom?: boolean;
+  left?: boolean;
+  right?: boolean;
+  centered?: boolean;
+}
