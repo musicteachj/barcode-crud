@@ -1,14 +1,18 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
+import Landing from "../views/Landing.vue";
+import Create from "../views/Create.vue";
+import Scan from "../views/Scan.vue";
+import Print from "../views/Print.vue";
+
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Landing",
-    component: () =>
-      import(/* webpackChunkName: "landing" */ "../views/Landing.vue"),
+    component: Landing,
     meta: {
       title: "Welcome - Barcode Gen",
       showNavigation: false,
@@ -17,8 +21,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/create",
     name: "Create",
-    component: () =>
-      import(/* webpackChunkName: "create" */ "../views/Create.vue"),
+    component: Create,
     meta: {
       title: "Create Barcode",
       showNavigation: true,
@@ -27,7 +30,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/scan",
     name: "Scan",
-    component: () => import(/* webpackChunkName: "scan" */ "../views/Scan.vue"),
+    component: Scan,
     meta: {
       title: "Scan Barcode",
       showNavigation: true,
@@ -36,8 +39,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/print",
     name: "Print",
-    component: () =>
-      import(/* webpackChunkName: "print" */ "../views/Print.vue"),
+    component: Print,
     meta: {
       title: "Print Barcodes",
       showNavigation: true,

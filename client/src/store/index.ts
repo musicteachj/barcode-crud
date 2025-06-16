@@ -1,7 +1,10 @@
 import Vue from "vue";
 import Vuex, { StoreOptions } from "vuex";
 import { RootState } from "./types";
+
+// Modules
 import { barcodes } from "./modules/barcodes";
+import { snackbar } from "./modules/snackbar";
 
 Vue.use(Vuex);
 
@@ -17,6 +20,7 @@ const store: StoreOptions<RootState> = {
   },
   modules: {
     barcodes,
+    snackbar,
   },
 };
 
