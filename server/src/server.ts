@@ -29,6 +29,7 @@ app.use(
         ],
         fontSrc: [
           "'self'",
+          "data:",
           "https://fonts.gstatic.com",
           "https://cdn.jsdelivr.net",
         ],
