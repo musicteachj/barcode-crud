@@ -13,8 +13,8 @@ export const snackbar: Module<SnackbarState, RootState> = {
     timeout: 4000,
     multiLine: false,
     vertical: false,
-    top: false,
-    bottom: true,
+    top: true,
+    bottom: false,
     left: false,
     right: false,
     centered: false,
@@ -28,8 +28,8 @@ export const snackbar: Module<SnackbarState, RootState> = {
       state.timeout = options.timeout || 4000;
       state.multiLine = options.multiLine || false;
       state.vertical = options.vertical || false;
-      state.top = options.top || false;
-      state.bottom = options.bottom !== undefined ? options.bottom : true;
+      state.top = options.top !== undefined ? options.top : true;
+      state.bottom = options.bottom || false;
       state.left = options.left || false;
       state.right = options.right || false;
       state.centered = options.centered || false;
@@ -48,8 +48,8 @@ export const snackbar: Module<SnackbarState, RootState> = {
       state.timeout = 4000;
       state.multiLine = false;
       state.vertical = false;
-      state.top = false;
-      state.bottom = true;
+      state.top = true;
+      state.bottom = false;
       state.left = false;
       state.right = false;
       state.centered = false;

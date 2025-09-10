@@ -6,7 +6,7 @@ import {
   BarcodeState,
   Barcode,
   BarcodeFormData,
-  BarcodeType,
+  // BarcodeType,
 } from "../types";
 
 export const barcodes: Module<BarcodeState, RootState> = {
@@ -14,20 +14,20 @@ export const barcodes: Module<BarcodeState, RootState> = {
 
   state: {
     barcodes: [
-      {
-        _id: "1",
-        name: "Sample Barcode 1",
-        value: "123456789012",
-        type: BarcodeType.EAN13,
-        createdAt: new Date(),
-      },
-      {
-        _id: "2",
-        name: "Sample Barcode 2",
-        value: "987654321098",
-        type: BarcodeType.UPC,
-        createdAt: new Date(),
-      },
+      // {
+      //   _id: "1",
+      //   name: "Sample Barcode 1",
+      //   value: "123456789012",
+      //   type: BarcodeType.EAN13,
+      //   createdAt: new Date(),
+      // },
+      // {
+      //   _id: "2",
+      //   name: "Sample Barcode 2",
+      //   value: "987654321098",
+      //   type: BarcodeType.UPC,
+      //   createdAt: new Date(),
+      // },
     ],
     loading: false,
     error: null,
