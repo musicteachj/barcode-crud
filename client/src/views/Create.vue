@@ -435,7 +435,7 @@ export default class Create extends Vue {
 
   // Lifecycle
   created() {
-    // this.fetchBarcodes();
+    this.fetchBarcodes();
   }
 
   // Methods
