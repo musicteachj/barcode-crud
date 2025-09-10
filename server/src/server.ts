@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import path from "path";
 import { connectDatabase } from "./config/database";
 import barcodeRoutes from "./routes/barcodes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
@@ -18,7 +19,10 @@ app.use(helmet());
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || "http://localhost:8080",
+  origin:
+    process.env.NODE_ENV === "production"
+      ? process.env.CORS_ORIGIN || true
+      : "http://localhost:8080",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -45,17 +49,32 @@ app.get("/health", (req, res) => {
 // API routes
 app.use("/api/barcodes", barcodeRoutes);
 
-// Root endpoint
-app.get("/", (req, res) => {
-  res.json({
-    message: "Barcode CRUD API Server",
-    version: "1.0.0",
-    endpoints: {
-      health: "/health",
-      barcodes: "/api/barcodes",
-    },
+// Serve static files from Vue app in production
+if (process.env.NODE_ENV === "production") {
+  const clientBuildPath = path.join(__dirname, "../../client/dist");
+  app.use(express.static(clientBuildPath));
+
+  // Handle client-side routing - serve index.html for all non-API routes
+  app.get("*", (req, res) => {
+    // Don't serve index.html for API routes
+    if (req.path.startsWith("/api/") || req.path === "/health") {
+      return res.status(404).json({ error: "API endpoint not found" });
+    }
+    return res.sendFile(path.join(clientBuildPath, "index.html"));
   });
-});
+} else {
+  // Development root endpoint
+  app.get("/", (req, res) => {
+    res.json({
+      message: "Barcode CRUD API Server",
+      version: "1.0.0",
+      endpoints: {
+        health: "/health",
+        barcodes: "/api/barcodes",
+      },
+    });
+  });
+}
 
 // 404 handler
 app.use(notFoundHandler);
