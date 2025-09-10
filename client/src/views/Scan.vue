@@ -363,6 +363,13 @@ export default class Scan extends Vue {
     this.isScanning = true;
     this.scannedBarcode = null;
 
+    // Small delay to ensure DOM is ready, especially important on mobile
+    setTimeout(() => {
+      this.initializeQuagga();
+    }, 100);
+  }
+
+  initializeQuagga() {
     // Initialize Quagga
     Quagga.init(
       {
@@ -370,18 +377,18 @@ export default class Scan extends Vue {
           type: "LiveStream",
           target: document.querySelector("#interactive"),
           constraints: {
-            width: { min: 640 },
-            height: { min: 480 },
+            width: this.isMobile ? { min: 320, max: 1920 } : { min: 640 },
+            height: this.isMobile ? { min: 240, max: 1080 } : { min: 480 },
             facingMode: "environment",
             aspectRatio: { min: 1, max: 2 },
           },
         },
         locator: {
-          patchSize: "medium",
+          patchSize: this.isMobile ? "small" : "medium",
           halfSample: true,
         },
-        numOfWorkers: navigator.hardwareConcurrency || 2,
-        frequency: 10,
+        numOfWorkers: this.isMobile ? 1 : navigator.hardwareConcurrency || 2,
+        frequency: this.isMobile ? 5 : 10,
         decoder: {
           readers: [
             "ean_reader",
@@ -399,7 +406,70 @@ export default class Scan extends Vue {
 
         if (err) {
           console.error("Quagga init error:", err);
-          this.showError("Failed to start camera");
+          console.error("Error details:", {
+            name: err.name,
+            message: err.message,
+            isMobile: this.isMobile,
+            userAgent: navigator.userAgent,
+          });
+
+          // More specific error messages
+          let errorMessage = "Failed to start camera";
+          if (err.name === "NotAllowedError") {
+            errorMessage =
+              "Camera access denied. Please allow camera access and try again.";
+          } else if (err.name === "NotFoundError") {
+            errorMessage = "No camera found on this device.";
+          } else if (err.name === "OverconstrainedError") {
+            errorMessage =
+              "Camera constraints not supported. Trying with basic settings...";
+            // Try again with minimal constraints
+            this.startScanWithMinimalConstraints();
+            return;
+          }
+
+          this.showError(errorMessage);
+          this.isScanning = false;
+          return;
+        }
+
+        Quagga.start();
+      }
+    );
+
+    // Set up event handlers
+    Quagga.onDetected(this.onDetected);
+    Quagga.onProcessed(this.onProcessed);
+  }
+
+  startScanWithMinimalConstraints() {
+    // Initialize Quagga with minimal constraints for problematic devices
+    Quagga.init(
+      {
+        inputStream: {
+          type: "LiveStream",
+          target: document.querySelector("#interactive"),
+          constraints: {
+            facingMode: "environment",
+          },
+        },
+        locator: {
+          patchSize: "small",
+          halfSample: true,
+        },
+        numOfWorkers: 1,
+        frequency: 5,
+        decoder: {
+          readers: ["ean_reader"],
+        },
+        locate: true,
+      },
+      (err) => {
+        if (err) {
+          console.error("Minimal constraints also failed:", err);
+          this.showError(
+            "Camera initialization failed. Please try refreshing the page."
+          );
           this.isScanning = false;
           return;
         }
@@ -416,6 +486,7 @@ export default class Scan extends Vue {
   stopScan() {
     Quagga.stop();
     this.isScanning = false;
+    this.loading = false;
   }
 
   onDetected(result: QuaggaResultObject) {
